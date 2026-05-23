@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Ընթերցողներ — {{ branch_info.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>👤 Ընթերցողներ — {{ branch_info.name }}</h2>
+  <a href="/readers/add/" class="btn btn-success">+ Գրանցել ընթերցող</a>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-5">
+    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Որոնել ըստ ազգանվան կամ տոմսի համարի…">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">🔍 Գտնել</button>
+  </div>
+</form>
+
+<table class="table table-hover bg-white shadow-sm rounded">
+  <thead class="table-light">
+    <tr><th>#</th><th>Անուն ազգանուն</th><th>Տոմսի համար</th><th>Հեռ.</th><th>Գրանցման ամսաթիվ</th><th>Կարգավիճակ</th></tr>
+  </thead>
+  <tbody>
+  {% for reader in readers %}
+    <tr>
+      <td>{{ reader.pk }}</td>
+      <td>{{ reader.full_name }}</td>
+      <td><code>{{ reader.card_number }}</code></td>
+      <td>{{ reader.phone|default:"—" }}</td>
+      <td>{{ reader.registered_at }}</td>
+      <td>{% if reader.is_active %}<span class="badge bg-success">Ակտիվ</span>{% else %}<span class="badge bg-secondary">Ոչ ակտիվ</span>{% endif %}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="text-muted text-center">Ընթերցողներ չեն գտնվել</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

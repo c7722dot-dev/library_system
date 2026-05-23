@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Ընթերցողի գրանցում{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+  <a href="/readers/" class="btn btn-outline-secondary btn-sm">← Վերադառնալ ցուցակին</a>
+</div>
+
+<h2 class="mb-4">👤 Ընթերցողի գրանցում — {{ branch_info.name }}</h2>
+
+<div class="card shadow-sm" style="max-width: 560px;">
+  <div class="card-body">
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Ազգանուն *</label>
+          <input type="text" name="last_name" class="form-control"
+                 value="{{ form_data.last_name|default:'' }}"
+                 placeholder="Հակոբյան" required autofocus>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Անուն *</label>
+          <input type="text" name="first_name" class="form-control"
+                 value="{{ form_data.first_name|default:'' }}"
+                 placeholder="Արամ" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Հայրանուն</label>
+        <input type="text" name="middle_name" class="form-control"
+               value="{{ form_data.middle_name|default:'' }}"
+               placeholder="Արամի">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Տոմսի համար *</label>
+        <div class="input-group">
+          <input type="text" name="card_number" id="cardNumber" class="form-control"
+                 value="{{ form_data.card_number|default:next_card }}"
+                 placeholder="{{ next_card }}" required>
+          <button type="button" class="btn btn-outline-secondary"
+                  onclick="document.getElementById('cardNumber').value='{{ next_card }}'">
+            Ավտ.
+          </button>
+        </div>
+        <div class="form-text">Հաջորդ համար` <strong>{{ next_card }}</strong></div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Հեռախոս</label>
+        <input type="text" name="phone" class="form-control"
+               value="{{ form_data.phone|default:'' }}"
+               placeholder="+374-91-000-000">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Email</label>
+        <input type="email" name="email" class="form-control"
+               value="{{ form_data.email|default:'' }}"
+               placeholder="email@example.com">
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-success px-4">
+          ✅ Գրանցել ընթերցող
+        </button>
+        <a href="/readers/" class="btn btn-outline-secondary">Չեղարկել</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

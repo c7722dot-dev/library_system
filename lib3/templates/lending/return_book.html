@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Վերադարձնել գիրք{% endblock %}
+{% block content %}
+<h2 class="mb-4">📥 Վերադարձնել գիրք</h2>
+<div class="card shadow-sm" style="max-width: 500px;">
+  <div class="card-body">
+    <p><strong>Գիրք՝</strong> {{ loan.book_title }}</p>
+    <p><strong>Գույքային №՝</strong> {{ loan.inventory_number }}</p>
+    <p><strong>Ընթերցող՝</strong> {{ loan.reader.full_name }} ({{ loan.reader.card_number }})</p>
+    <p><strong>Տրամադրվել է՝</strong> {{ loan.issued_at }}</p>
+    <p><strong>Վերադարձի ժամկետ՝</strong>
+      {{ loan.due_date }}
+      {% if loan.is_overdue %}<span class="badge bg-danger ms-1">Ժամկետանց!</span>{% endif %}
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary me-2">✅ Հաստատել վերադարձը</button>
+      <a href="/loans/" class="btn btn-outline-secondary">Չեղարկել</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

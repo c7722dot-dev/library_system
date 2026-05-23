@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="/" class="btn btn-outline-secondary btn-sm">← Վերադառնալ կատալոգ</a>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="row">
+
+      <!-- Обложка -->
+      <div class="col-md-3 text-center mb-3 mb-md-0">
+        {% if book.cover %}
+          <img src="{{ book.cover.url }}"
+               class="img-fluid rounded shadow-sm"
+               style="max-height:400px; object-fit:contain; width:100%; background:#1a1a2e;"
+               alt="{{ book.title }}">
+        {% elif book.isbn %}
+          <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn|cut:"-"|cut:" " }}-L.jpg"
+               class="img-fluid rounded shadow-sm"
+               style="max-height:400px; object-fit:contain; width:100%; background:#1a1a2e;"
+               alt="{{ book.title }}"
+               onerror="this.outerHTML='<div class=\'bg-light rounded d-flex align-items-center justify-content-center\' style=\'height:400px; font-size:4rem; background:#1a1a2e; color:white;\'>📚</div>'">
+        {% else %}
+          <div class="bg-light rounded d-flex align-items-center justify-content-center"
+               style="height:400px; font-size:4rem; border:1px solid #dee2e6; background:#1a1a2e; color:white;">
+            📚
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Информация о книге -->
+      <div class="col-md-9">
+        <h2 class="card-title">{{ book.title }}</h2>
+        <p class="text-muted mb-1">
+          <strong>Հեղինակ(ներ)՝</strong> {{ book.authors.all|join:", " }}
+        </p>
+        {% if book.genre %}
+          <p class="mb-1"><strong>Ժանր՝</strong> {{ book.genre }}</p>
+        {% endif %}
+        {% if book.year %}
+          <p class="mb-1"><strong>Տարեթիվ՝</strong> {{ book.year }}</p>
+        {% endif %}
+        {% if book.isbn %}
+          <p class="mb-1"><strong>ISBN՝</strong> <code>{{ book.isbn }}</code></p>
+        {% endif %}
+        {% if book.language %}
+          <p class="mb-1"><strong>Լեզու՝</strong> {{ book.get_language_display }}</p>
+        {% endif %}
+        {% if book.description %}
+          <hr>
+          <p>{{ book.description }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<h4>📦 Օրինակներ
+  <a href="/books/{{ book.pk }}/add-copy/"
+     class="btn btn-sm btn-outline-primary ms-2">+ Ավելացնել օրինակ</a>
+</h4>
+
+<table class="table table-hover bg-white shadow-sm rounded">
+  <thead class="table-light">
+    <tr>
+      <th>Գույքային №</th>
+      <th>Մասնաճյուղ</th>
+      <th>Կարգավիճակ</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for copy in book.copies.all %}
+    <tr>
+      <td><code>{{ copy.inventory_number }}</code></td>
+      <td>{{ copy.branch.name }}</td>
+      <td>
+        {% if copy.status == 'available' %}
+          <span class="badge bg-success">Հասանելի</span>
+        {% elif copy.status == 'lent' %}
+          <span class="badge bg-warning text-dark">Տրամադրված</span>
+        {% elif copy.status == 'lost' %}
+          <span class="badge bg-danger">Կորցված</span>
+        {% else %}
+          <span class="badge bg-secondary">{{ copy.get_status_display }}</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if copy.status == 'available' %}
+          <a href="/loans/issue/" class="btn btn-sm btn-outline-success">Տրամադրել</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr>
+      <td colspan="4" class="text-muted text-center">Օրինակներ չկան</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

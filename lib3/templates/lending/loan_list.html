@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Գրքերի տրամադրումներ — {{ branch_info.name }}{% endblock %}
+{% block content %}
+
+{% with active_branch_id=active_branch_id all_branches=branches active_branch_info=branch_info %}
+{% endwith %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>📋 Տրամադրումներ — {{ branch_info.name }}</h2>
+  <a href="/loans/issue/" class="btn btn-success">+ Տրամադրել գիրք</a>
+</div>
+
+<ul class="nav nav-pills mb-3">
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'active' %}active{% endif %}" href="?status=active">Ձեռքին</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'overdue' %}active bg-danger{% endif %}" href="?status=overdue">Ժամկետանց</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'returned' %}active{% endif %}" href="?status=returned">Վերադարձված</a>
+  </li>
+</ul>
+
+<table class="table table-hover bg-white shadow-sm rounded">
+  <thead class="table-light">
+    <tr>
+      <th>Գիրք</th>
+      <th>Գույքային №</th>
+      <th>Ընթերցող</th>
+      <th>Տրամադրվել է</th>
+      <th>Վերադարձի ժամկետ</th>
+      <th>Վերադարձված</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for loan in loans %}
+    <tr {% if not loan.returned_at and loan.due_date < today %}class="table-danger"{% endif %}>
+      <td>{{ loan.book_title }}</td>
+      <td><code>{{ loan.inventory_number }}</code></td>
+      <td>{{ loan.reader.full_name }}<br><small class="text-muted">{{ loan.reader.card_number }}</small></td>
+      <td>{{ loan.issued_at }}</td>
+      <td>
+        {{ loan.due_date }}
+        {% if loan.is_overdue %}<span class="badge bg-danger ms-1">Ժամկետանց</span>{% endif %}
+      </td>
+      <td>{{ loan.returned_at|default:"—" }}</td>
+      <td>
+        {% if not loan.returned_at %}
+          <a href="/loans/{{ loan.pk }}/return/" class="btn btn-sm btn-outline-primary">Վերադարձնել</a>
+        {% else %}
+          <span class="text-success">✅</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="text-muted text-center">Տրամադրումներ չկան</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Ավելացնել օրինակ — {{ book.title }}{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+  <a href="/books/{{ book.pk }}/" class="btn btn-outline-secondary btn-sm">← Վերադառնալ գրքի էջ</a>
+</div>
+
+<h2 class="mb-4">📦 Ավելացնել օրինակ</h2>
+
+<div class="card shadow-sm mb-3" style="max-width: 500px;">
+  <div class="card-header bg-light">
+    <strong>{{ book.title }}</strong>
+    {% if book.authors.all %}<br><small class="text-muted">{{ book.authors.all|join:", " }}</small>{% endif %}
+  </div>
+  <div class="card-body">
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Մասնաճյուղ</label>
+        <select name="branch_id" class="form-select" required>
+          <option value="">— Ընտրեք մասնաճյուղ —</option>
+          {% for branch in branches %}
+            <option value="{{ branch.pk }}">{{ branch.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Գույքային համար</label>
+        <input type="text" name="inventory_number" class="form-control"
+               placeholder="Օրինակ՝ INV-0001" required>
+        <div class="form-text">Պետք է լինի եզակի ամբողջ համակարգում</div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">✅ Ավելացնել</button>
+        <a href="/books/{{ book.pk }}/" class="btn btn-outline-secondary">Չեղարկել</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

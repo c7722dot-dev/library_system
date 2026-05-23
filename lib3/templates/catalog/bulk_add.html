@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Գրքերի ներմուծում{% endblock %}
+{% block content %}
+
+<h2 class="mb-1">📥 Գրքերի ներմուծում Excel-ից</h2>
+<p class="text-muted mb-4">Լրացրեք Excel ֆայլը և վերբեռնեք</p>
+
+{% if results %}
+<div class="mb-4">
+  {% with ok_count=0 %}
+  <h5>Արդյունքներ</h5>
+  <div style="max-height:320px;overflow-y:auto;" class="border rounded p-3 bg-white">
+    {% for r in results %}
+      <div class="small {% if r.ok %}text-success{% else %}text-danger{% endif %}">
+        {{ r.msg }}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-2 d-flex gap-2">
+    <a href="/" class="btn btn-primary btn-sm">Կատալոգ</a>
+    <a href="" class="btn btn-outline-secondary btn-sm">Նորից բացել էջը</a>
+  </div>
+  {% endwith %}
+</div>
+{% endif %}
+
+<div class="row g-4" style="max-width:860px;">
+
+  <!-- Քայլ 1 -->
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0" style="border-left:4px solid #0d6efd !important;">
+      <div class="card-body">
+        <h5 class="card-title">📋 Քայլ 1 — Կաղապար</h5>
+        <p class="card-text text-muted small">Ներբեռնեք Excel կաղապարը, լրացրեք այն և պահպանեք:</p>
+        <a href="/books/import/template/" class="btn btn-outline-primary">
+          ⬇ Ներբեռնել կաղապարը (.xlsx)
+        </a>
+        <hr>
+        <p class="small text-muted mb-1"><strong>Սյունակները ֆայլում․</strong></p>
+        <table class="table table-sm table-bordered small mb-0">
+          <tr><td><code>title</code></td><td>Անվանում <span class="text-danger">*</span></td></tr>
+          <tr><td><code>authors</code></td><td>Հեղինակ(ներ) (Ազգանուն, Անուն)</td></tr>
+          <tr><td><code>genre</code></td><td>Ժանր</td></tr>
+          <tr><td><code>year</code></td><td>Տարեթիվ</td></tr>
+          <tr><td><code>isbn</code></td><td>ISBN</td></tr>
+          <tr><td><code>inventory_number</code></td><td>Հաշվառման №</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Քայլ 2 -->
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0" style="border-left:4px solid #198754 !important;">
+      <div class="card-body">
+        <h5 class="card-title">📤 Քայլ 2 — Բեռնում</h5>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="file">
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Մասնաճյուղ</label>
+            <select name="default_branch_id" class="form-select form-select-sm">
+              <option value="">— Ընտրեք մասնաճյուղ —</option>
+              {% for b in branches %}
+                <option value="{{ b.pk }}">{{ b.name }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Կկիրառվի ֆայլի բոլոր տողերի նկատմամբ</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Ֆայլ (.xlsx կամ .csv)</label>
+            <input type="file" name="csv_file" class="form-control form-control-sm"
+                   accept=".xlsx,.csv" required>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100">
+            ✅ Բեռնել և պահպանել
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

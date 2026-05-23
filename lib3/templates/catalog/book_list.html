@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Գրքերի կատալոգ{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>📖 Գրքերի կատալոգ</h2>
+  <span class="text-muted">Գտնված՝ {{ books|length }}</span>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-5">
+    <input type="text" name="q" value="{{ query }}" class="form-control"
+           placeholder="Որոնել ըստ անվանման, հեղինակի, ISBN…">
+  </div>
+  <div class="col-md-3">
+    <select name="genre" class="form-select">
+      <option value="">Բոլոր ժանրերը</option>
+      {% for g in genres %}
+        <option value="{{ g.id }}"
+          {% if selected_genre == g.id|stringformat:"s" %}selected{% endif %}>
+          {{ g.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="branch" class="form-select">
+      <option value="">Բոլոր մասնաճյուղերը</option>
+      {% for b in branches %}
+        <option value="{{ b.id }}"
+          {% if selected_branch == b.id|stringformat:"s" %}selected{% endif %}>
+          {{ b.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-1">
+    <button type="submit" class="btn btn-primary w-100">🔍</button>
+  </div>
+</form>
+
+<div class="row row-cols-2 row-cols-md-5 g-2">
+{% for book in books %}
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+
+      <!-- Обложка -->
+      <a href="/books/{{ book.pk }}/">
+        {% if book.cover %}
+          <img src="{{ book.cover.url }}"
+               class="card-img-top"
+               style="height:360px; object-fit:contain; background:#1a1a2e;"
+               alt="{{ book.title }}">
+        {% elif book.isbn %}
+          <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn|cut:"-"|cut:" " }}-M.jpg"
+               class="card-img-top"
+               style="height:360px; object-fit:contain; background:#1a1a2e;"
+               alt="{{ book.title }}"
+               onerror="this.outerHTML='<div class=\'bg-light d-flex align-items-center justify-content-center\' style=\'height:360px; font-size:3rem; background:#1a1a2e; color:white;\'>📚</div>'">
+        {% else %}
+          <div class="bg-light d-flex align-items-center justify-content-center"
+               style="height:360px; font-size:3rem; background:#1a1a2e; color:white;">
+            📚
+          </div>
+        {% endif %}
+      </a>
+
+      <div class="card-body">
+        <h6 class="card-title mb-1">
+          <a href="/books/{{ book.pk }}/" class="text-decoration-none">
+            {{ book.title }}
+          </a>
+        </h6>
+        <small class="text-muted">{{ book.authors.all|join:", " }}</small>
+        {% if book.genre %}
+          <br><span class="badge bg-secondary mt-1">{{ book.genre }}</span>
+        {% endif %}
+      </div>
+
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <small>{{ book.year|default:"—" }}</small>
+        {% with count=book.copies.all|length %}
+          {% if count > 0 %}
+            <span class="badge bg-success">✅ {{ count }}</span>
+          {% else %}
+            <span class="badge bg-danger">0</span>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+    </div>
+  </div>
+{% empty %}
+  <div class="col-12">
+    <p class="text-muted">Գրքեր չեն գտնվել։</p>
+  </div>
+{% endfor %}
+</div>
+
+{% endblock %}

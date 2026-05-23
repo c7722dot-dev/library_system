@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Տրամադրման գիրք{% endblock %}
+{% block content %}
+
+<h2 class="mb-4">📤 Տրամադրել գիրք — {{ branch_info.name }}</h2>
+
+<div class="card shadow-sm" style="max-width: 650px;">
+  <div class="card-body">
+    <form method="post" id="issueForm">
+      {% csrf_token %}
+
+      <!-- ── Գրքի որոնում ── -->
+      <div class="mb-3">
+        <label class="form-label fw-bold">Գրքի անվանում</label>
+        <input type="text" id="bookSearch" class="form-control mb-1"
+               placeholder="🔍 Գրել անվանումը կամ գույքագրման համարը...">
+        <select name="book_copy_id" id="bookSelect" class="form-select" required size="5"
+                style="height:auto; min-height:120px;">
+          {% for copy in available_copies %}
+            <option value="{{ copy.pk }}"
+                    data-search="{{ copy.inventory_number|lower }} {{ copy.book.title|lower }}">
+              [{{ copy.inventory_number }}] {{ copy.book.title }} ({{ copy.branch.name }})
+            </option>
+          {% endfor %}
+        </select>
+        <div class="form-text text-muted" id="bookCount"></div>
+      </div>
+
+      <!-- ── Ընթերցողի որոնում ── -->
+      <div class="mb-3">
+        <label class="form-label fw-bold">Ընթերցող</label>
+        <input type="text" id="readerSearch" class="form-control mb-1"
+               placeholder="🔍 Գրել ազգանունը կամ քարտի համարը...">
+        <select name="reader_id" id="readerSelect" class="form-select" required size="5"
+                style="height:auto; min-height:120px;">
+          {% for reader in readers %}
+            <option value="{{ reader.pk }}"
+                    data-search="{{ reader.full_name|lower }} {{ reader.card_number|lower }}">
+              {{ reader.full_name }} ({{ reader.card_number }})
+            </option>
+          {% endfor %}
+        </select>
+        <div class="form-text text-muted" id="readerCount"></div>
+      </div>
+
+      <!-- ── Ժամկետ ── -->
+      <div class="mb-3">
+        <label class="form-label fw-bold">Տրամադրման ժամկետ (օր)</label>
+        <input type="number" name="due_days" value="14" min="1" max="90"
+               class="form-control" style="max-width:120px;">
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">✅ Տրամադրել</button>
+        <a href="/loans/" class="btn btn-outline-secondary">Չեղարկել</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function liveFilter(inputId, selectId, countId) {
+  const input  = document.getElementById(inputId);
+  const select = document.getElementById(selectId);
+  const countEl = document.getElementById(countId);
+  const allOptions = Array.from(select.options);
+
+  input.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    let visible = 0;
+
+    allOptions.forEach(opt => {
+      const match = !q || opt.dataset.search.includes(q);
+      opt.hidden = !match;
+      opt.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+
+    // Եթե տեսանելի է միայն մեկ արդյունք՝ ավտոմատ ընտրել այն
+    if (visible === 1) {
+      allOptions.find(o => !o.hidden).selected = true;
+    }
+
+    countEl.textContent = q ? `Գտնված՝ ${visible}` : '';
+  });
+}
+
+liveFilter('bookSearch',   'bookSelect',   'bookCount');
+liveFilter('readerSearch', 'readerSelect', 'readerCount');
+</script>
+{% endblock %}
